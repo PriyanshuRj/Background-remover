@@ -8,7 +8,7 @@ from skimage import io
 import tensorflow as tf 
 import matplotlib.pyplot as plt
 
-upload_folder = "static"
+upload_folder = "images"
 model_folder = "models"
 
 

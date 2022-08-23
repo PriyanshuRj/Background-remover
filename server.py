@@ -1,4 +1,5 @@
 import os
+import re
 import cv2
 import random
 import string
@@ -11,7 +12,7 @@ import matplotlib.pyplot as plt
 import os
 from pathlib import Path
 from flask import Flask, render_template, request, Response, jsonify, send_file
-upload_folder = "static"
+upload_folder = "images"
 model_folder = "models"
 app = Flask(__name__)
 
@@ -56,7 +57,9 @@ def pred_fun(imgpath=None):
     
     return imgs,prd
 
-
+@app.route("/", methods= ['POST', 'GET'])
+def hello():
+    return render_template("index.html")
 @app.route("/zip", methods= ['POST', 'GET'])
 def upload_file():
     
@@ -76,11 +79,11 @@ def upload_file():
             pred_location = image_save(pred, pred_image_name) 
                    
             zipf = zipfile.ZipFile('Name.zip','w', zipfile.ZIP_DEFLATED)
-            for root,dirs, files in os.walk('static/'):
+            for root,dirs, files in os.walk('images/'):
                 for file in files:
-                    zipf.write('static/'+file)
+                    zipf.write('images/'+file)
             zipf.close()
-            p = Path('static').glob('**/*')
+            p = Path('images').glob('**/*')
             for i in  p:
                 os.remove(i)
             return send_file('Name.zip',
@@ -95,7 +98,7 @@ def upload_file():
 
 @app.route("/imgs", methods= ['POST', 'GET'])
 def upload_file2():
-    p = Path('static').glob('**/*')
+    p = Path('images').glob('**/*')
     for i in  p:
         os.remove(i)
     if request.method == "POST":
