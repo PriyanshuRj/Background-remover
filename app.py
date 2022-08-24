@@ -49,13 +49,21 @@ def pred_fun(imgpath=None):
     prd = pred.copy()
     prd = prd.reshape(prd.shape[1:-1])
 
-    prd[np.where(prd>0.87)] = 1
+    prd[np.where(prd>0.80)] = 1
     imgs[:,:,0] = imgs[:,:,0]*prd
+    imgs[:,:,0][np.where(prd!=1)] = 255
+
     imgs[:,:,1] = imgs[:,:,1]*prd
+    imgs[:,:,1][np.where(prd!=1)] = 255
+
     imgs[:,:,2] = imgs[:,:,2]*prd
+    imgs[:,:,2][np.where(prd!=1)] = 255
+    # imgs[:,:,3] = imgs[np.where(prd!=1)] = 1
     print(imgs.shape)
     
     return imgs,prd
+
+app.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.jpeg']
 
 @app.route("/", methods= ['POST', 'GET'])
 def hello():
@@ -66,28 +74,32 @@ def upload_file():
     if request.method == "POST":
         input_image_file = request.files["image"]
         if input_image_file:
-            image_location = os.path.join(upload_folder, input_image_file.filename)
-            input_image_file.save(image_location)
+            file_ext = os.path.splitext(input_image_file.filename)[1]
+            if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+                return jsonify({'status': 404, 'message' : "THe uploaded file is not an supported image format."})
+            else : 
+                image_location = os.path.join(upload_folder, input_image_file.filename)
+                input_image_file.save(image_location)
 
-            imgs = image_load(image_location)
-            imgs_name = 'new_' + ''.join(random.choices(
-                string.ascii_uppercase + string.ascii_lowercase + string.digits, k = 2)) + input_image_file.filename
-            imgs_location = image_save(imgs, imgs_name)
+                imgs = image_load(image_location)
+                imgs_name = 'new_' + ''.join(random.choices(
+                    string.ascii_uppercase + string.ascii_lowercase + string.digits, k = 2)) + input_image_file.filename
+                imgs_location = image_save(imgs, imgs_name)
 
-            pred,mask = pred_fun(imgpath= imgs_location)
-            pred_image_name = 'pred_'+ imgs_name
-            pred_location = image_save(pred, pred_image_name) 
-                   
-            zipf = zipfile.ZipFile('Name.zip','w', zipfile.ZIP_DEFLATED)
-            for root,dirs, files in os.walk('images/'):
-                for file in files:
-                    zipf.write('images/'+file)
-            zipf.close()
-            p = Path('images').glob('**/*')
-            for i in  p:
-                os.remove(i)
-            return send_file('Name.zip',
-                    mimetype = 'zip')
+                pred,mask = pred_fun(imgpath= imgs_location)
+                pred_image_name = 'pred_'+ imgs_name
+                pred_location = image_save(pred, pred_image_name) 
+                    
+                zipf = zipfile.ZipFile('Name.zip','w', zipfile.ZIP_DEFLATED)
+                for root,dirs, files in os.walk('images/'):
+                    for file in files:
+                        zipf.write('images/'+file)
+                zipf.close()
+                p = Path('images').glob('**/*')
+                for i in  p:
+                    os.remove(i)
+                return send_file('Name.zip',
+                        mimetype = 'zip')
 
          
         
@@ -104,20 +116,23 @@ def upload_file2():
     if request.method == "POST":
         input_image_file = request.files["image"]
         if input_image_file:
-            
-            image_location = os.path.join(upload_folder, input_image_file.filename)
-            input_image_file.save(image_location)
+            file_ext = os.path.splitext(input_image_file.filename)[1]
+            if file_ext not in app.config['UPLOAD_EXTENSIONS']:
+                return jsonify({'status': 404, 'message' : "THe uploaded file is not an supported image format."})
+            else : 
+                image_location = os.path.join(upload_folder, input_image_file.filename)
+                input_image_file.save(image_location)
 
-            imgs = image_load(image_location)
-            imgs_name = 'new_' + ''.join(random.choices(
-                string.ascii_uppercase + string.ascii_lowercase + string.digits, k = 2)) + input_image_file.filename
-            imgs_location = image_save(imgs, imgs_name)
+                imgs = image_load(image_location)
+                imgs_name = 'new_' + ''.join(random.choices(
+                    string.ascii_uppercase + string.ascii_lowercase + string.digits, k = 2)) + input_image_file.filename
+                imgs_location = image_save(imgs, imgs_name)
 
-            pred,mask = pred_fun(imgpath= imgs_location)
-            pred_image_name = 'pred_'+ imgs_name
-            pred_location = image_save(pred, pred_image_name)            
-            return send_file(pred_location,
-                    mimetype = 'zip')
+                pred,mask = pred_fun(imgpath= imgs_location)
+                pred_image_name = 'pred_'+ imgs_name
+                pred_location = image_save(pred, pred_image_name)            
+                return send_file(pred_location,
+                        mimetype = 'jpg')
 
          
         
