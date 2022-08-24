@@ -76,8 +76,14 @@ Response:
 common image extensions - zip, .7z, .rar, .tar.gz
 ```
 ## Screenshorts off API operations
+
+uploading wrong file type
 ![screen3](https://user-images.githubusercontent.com/76838551/186371923-e727bd15-44fe-4a7a-87a3-ae0119f4e1b9.jpg)
+
+saving image output
 ![Screenshot 2022-08-24 140524screen2](https://user-images.githubusercontent.com/76838551/186371937-c1421fab-4c4c-438a-aa26-88abfebaea72.jpg)
+
+Calling API with correct format of image
 ![screen1](https://user-images.githubusercontent.com/76838551/186371940-69d4685d-c6b0-4794-b25c-4037f6ed28f2.jpg)
 
 
